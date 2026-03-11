@@ -1,0 +1,42 @@
+# AI-Assisted Technical Book Translator
+
+The application architecture has been entirely scaffolded and built, featuring the Python FastAPI backend, the Vite + React frontend, the Sliding Window context LLM service, and strict Pane Synchronization.
+
+## Components Implemented
+1.  **FastAPI Backend (Python)**
+    *   `pdf_service.py` securely extracts PDF text per-page using PyMuPDF.
+    *   `llm_service.py` constructs a Sliding Window (N-1, N, N+1) prompt to feed into the local LM Studio instance (`http://localhost:1234/v1`).
+    *   `progress_manager.py` tracks concurrent background task translation states (Current, Total, Percentage, ETR) and broadcasts them via SSE (Server-Sent Events) on `/api/stream/progress/{book}`.
+    *   `storage_service.py` handles writing and loading `1.md`, `2.md` within `/books/{BookName}`.
+
+2.  **React Frontend (Vite + TS)**
+    *   **Dual-Pane UI**: `App.tsx` controls a `currentPage` state synced strictly across both Left (PDF) and Right (Markdown) panes.
+    *   **PDFPane**: Utilizes `@react-pdf-viewer/core` mapped to a static worker. Navigating the PDF synchronously changes the current global page.
+    *   **MarkdownPane**: Incorporates a raw editor and a styled renderer (`react-markdown`).
+    *   **RTL + BiDi Engine**: Extensive CSS rules were created to wrap `direction: rtl` for the markdown viewer but enforce `direction: ltr; unicode-bidi: embed` on `<code>` blocks to keep mathematical algorithms and programmatic functions structurally intact while the narrative Arabic reads Right-to-Left.
+    *   **Progress Streaming**: The UI controls bar establishes an EventSource connection. When the "Batch Translate" button is fired, a progress bar dynamically updates and displays the Estimated Time Remaining (ETR) based on inference speeds.
+
+## Validation Results
+*   **Compile Status**: Built flawlessly across both React and Python typechecks.
+*   **UI Architecture**: Built completely componentized with a responsive layout.
+*   **RTL Rendering**: Styled correctly to enforce a premium, beautiful aesthetic without standard Tailwind defaults.
+
+## Docker Containerization Setup
+
+The application has been fully containerized for simplified orchestration and deployment. Here's how to spin it up:
+
+### System Architecture
+- **Backend Service (Port 8000):** Built on a lightweight `python:3.11-slim` image running FastAPI. The local `/backend/books` and `/backend/uploads` directories are mounted as volumes to ensure the translated Markdown output persists on your host machine perfectly intact. 
+- **Frontend Service (Port 5173 mapped to container Port 80):** A multi-stage Docker build that compiles the React application using Node and then serves the static artifact securely and cleanly via `nginx:alpine`.
+- **LM Studio Networking:** Inside `docker-compose.yml`, the Backend container is strictly configured with the `host.docker.internal:1234` environment variable. This allows the isolated container environment to securely break out and communicate with the LM Studio API functioning on your host's local machine.
+
+### Commands to Run
+1. Make sure you have Docker daemon running on your host system.
+2. In the root directory `/Users/dark_mac/Doros/Kutob` launch the orchestration:
+```bash
+docker-compose up -d --build
+```
+3. Once running, open your browser to `http://localhost:5173`.
+4. Ensure your PDFs are sitting natively in `backend/uploads/{book_name}.pdf` and all translated `.md` outputs will synchronously be written outside the container and into your local `backend/books/{book_name}` folder.
+
+You may now test the translation engine by running this docker compose set! Let me know if you would like me to adjust any UI layout or LLM prompt specifics.

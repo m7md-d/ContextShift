@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+PyMuPDF
+openai
+sse-starlette
+pydantic
+python-multipart
+aiofiles

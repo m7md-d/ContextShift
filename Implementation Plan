@@ -1,0 +1,57 @@
+# AI-Assisted Technical Book Translator
+
+## Goal Description
+Build a web application to translate highly technical computer science PDFs into Arabic Markdown files, page by page, using a local LLM via LM Studio. The app features a dual-pane UI (PDF on the left, Markdown on the right) and implements a sliding window context (N-1, N, N+1) to ensure high translation quality without breaking the context window.
+
+## User Review Required
+> [!IMPORTANT]
+> - Do you agree with using **Python/FastAPI** (Backend) and **React/Vite with TypeScript** (Frontend) for the stack? 
+> - I will use CSS Modules / vanilla CSS with modern layout features (Grid, variables) for a premium aesthetic, as Tailwind should be avoided unless requested. Let me know if you would prefer Tailwind CSS.
+> - Let me know if you prefer a different local LLM API port than the standard LM Studio `http://localhost:1234/v1`.
+
+## Proposed Changes
+Since this is a greenfield project, no existing code will be modified. The initial structure will be partitioned into backend and frontend applications inside the chosen workspace: `/Users/dark_mac/Doros/Kutob`.
+
+### Backend (Python / FastAPI)
+The Backend will handle PDF parsing, LLM context construction, and File I/O.
+#### [NEW] backend/requirements.txt
+Dependencies: `fastapi`, `uvicorn`, `PyMuPDF` (for PDF text extraction), `openai` (for LM Studio REST API calls).
+#### [NEW] backend/main.py
+Main API application. Exposes endpoints for translating a page, batch translating, and saving/approving markdown files.
+#### [NEW] backend/services/pdf_service.py
+Handles the extraction of total pages and exact text for a given page using PyMuPDF.
+#### [NEW] backend/services/llm_service.py
+Implements the Sliding Window logic (Page N-1, N, N+1) and sends requests to the local OpenAI-compatible endpoint.
+#### [NEW] backend/services/storage_service.py
+Handles creating `BookName/` directories and saving `1.md`, `2.md` locally.
+
+---
+
+### Frontend (Vite / React / TypeScript)
+The Frontend will manage the dual-pane UI and markdown rendering.
+#### [NEW] frontend/package.json
+Dependencies: `react`, `react-dom`, `@react-pdf-viewer/core`, `react-markdown`, `remark-gfm`, `rehype-highlight`.
+#### [NEW] frontend/src/App.tsx
+The core Layout utilizing CSS Grid, displaying the PDF viewer on the left Pane and the Markdown Editor on the right Pane.
+#### [NEW] frontend/src/components/PDFPane.tsx
+Wraps the React PDF Viewer, syncing the active page with the global state.
+#### [NEW] frontend/src/components/MarkdownPane.tsx
+A split view or tabbed component that allows raw text editing of the translated response and rendering of the markdown.
+#### [NEW] frontend/src/components/Controls.tsx
+Houses the primary user actions: "Translate Current Page", "Approve/Commit", "Batch Translate Entire Book", and pagination controls.
+
+## Verification Plan
+
+### Automated Tests
+*   Backend endpoint tests using `pytest` and `httpx` to verify that the `/api/translate/page` correctly merges the N-1, N, N+1 text context, while only requesting N to be translated in the system prompt.
+*   Unit tests for `pdf_service.py` verifying that text boundaries properly match single pages.
+
+### Manual Verification
+*   Start the FastAPI server and Vite dev server (`npm run dev`).
+*   Open the application in Chrome.
+*   Upload/select a test PDF (e.g., a sample from CS:APP).
+*   Verify the left pane correctly shows page 10.
+*   Click "Translate Current Page". Verify that the network request to `localhost:1234` is triggered, and the sliding window context contains pages 9, 10, and 11.
+*   Verify that the resulting markdown is rendered properly in the Right Pane.
+*   Click "Approve/Commit" and verify that `BookName/10.md` is created correctly in the project directory.
+*   Test the Background Task "Batch Translate" for 3 pages and verify files are written locally.

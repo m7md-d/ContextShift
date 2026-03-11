@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&family=Cairo:wght@400;600;700&display=swap');
+
+:root {
+  --bg-color: #0c0c0e;
+  --surface-color: #1a1a1f;
+  --surface-hover: #2a2a35;
+  --text-primary: #f0f0f5;
+  --text-secondary: #9aa0a6;
+  --accent-color: #6366f1;
+  --accent-hover: #818cf8;
+  --border-color: #2d2d39;
+  --danger-color: #f43f5e;
+  --success-color: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Cairo', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Base Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  height: 60px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  height: calc(100vh - 60px);
+}
+
+.pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  overflow: hidden;
+  position: relative;
+}
+
+/* RTL & BiDi Markdown Styles */
+.markdown-pane {
+  direction: rtl;
+  text-align: right;
+  padding: 24px;
+  overflow-y: auto;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.markdown-pane h1, .markdown-pane h2, .markdown-pane h3 {
+  font-family: 'Cairo', sans-serif;
+  color: var(--text-primary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Protect English Technical terms and code snippets */
+.markdown-pane code {
+  direction: ltr;
+  unicode-bidi: embed;
+  font-family: monospace;
+  background-color: var(--surface-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #a5b4fc;
+}
+
+.markdown-pane pre {
+  direction: ltr;
+  text-align: left;
+  background-color: var(--surface-color);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid var(--border-color);
+}
+
+.markdown-pane pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* Controls */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background-color: var(--surface-hover);
+}
+
+.btn.primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.btn.primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn.success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Editor text area for raw markdown */
+.md-editor {
+  direction: rtl;
+  width: 100%;
+  height: 50vh;
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  font-family: 'Cairo', monospace;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  resize: vertical;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.md-editor:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Toggle Tabs for Editor vs Preview */
+.tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+}
+
+.tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+}
